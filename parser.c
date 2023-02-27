@@ -10,6 +10,9 @@
 void parser(char* fileName) {
 	lookahead = 0;
 
+//	registers = 0;
+//	varNumber = 0;
+
 	initLexer(fileName);
 	match(lookahead);
 	match(BEGIN);
@@ -24,6 +27,14 @@ void parser(char* fileName) {
 
 
 void assignmentStmt() {
+/*	char a[30];
+	strcpy(a, idLexan);
+
+	if(lookahead == INT) {
+		match(INT);
+		if(lookupVar(idLexan)) {
+			printf("Line: % Redeclaration of %s\n", lineNum, idLexan);
+*/
 	match(ID);
 	if (lookahead != '=') {
 		printf("Expected an '=' on line %d, col %d\nFail\n", getLineNum(), getColNum());
@@ -47,9 +58,21 @@ void expression() {
 void term() {
 	factor();
 	while (lookahead == '*' || lookahead == '/') {
-		match(lookahead);
+			match(lookahead);
 		factor();
 	}
+
+/*	while (lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '/') {
+		char* firstLook = setOperator(lookahead);
+		match(lookahead);
+		factor();
+		sprintf(output + strlen(output), "R%d = R%d %s R%d\n", registers - 2,
+				registers - 2, firstLook, registers -1);
+		registers -= 1;
+		strcpy(vars[varNumber], firstLook);
+		varsNumber++;
+	}
+*/
 }
 
 void factor() {
@@ -109,3 +132,20 @@ void end(int status) {
 	cleanTable(symbolTable);
 	exit(EXIT_SUCCESS);
 }
+
+//project 2 method setOperator
+char* setOperator(int lookahead) {
+	if(lookahead == '+' ){ 
+		return "+";
+	}
+	else if(lookahead == '-') {
+		return "-";
+	}
+	else if(lookahead == '*') {
+		return "*";
+	}
+	else {
+		return "/";
+	}
+}
+
