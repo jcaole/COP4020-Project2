@@ -119,7 +119,18 @@ void match(int type) {
 
 	if (lookahead == type) {
 		lookahead = lexan();
-	} 
+	}
+
+	//added for project 2
+	else if(type == ID) {
+		if(lookupVar(idLexan) == 0) {
+		printf("Semantic error: variable %s is used before it has been declared on line %d, col %d.\n", idLexan, getLineNum(), getColNum());
+		end(1);
+		}
+		lookahead = lexan();
+	}
+
+
 	//
 	else if (type == ')') {
 		printf("Missing closing parenthesis on line %d, col %d.\n", getLineNum(), getColNum());

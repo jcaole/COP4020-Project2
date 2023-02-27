@@ -67,4 +67,8 @@ HashTable* initSymbolTable();
 //method to check word in symbol table
 int lookup(char *word);
 
+//methods added for project 2
+Entry* lookupEntry(HashTable* table, const char *word);
+int lookupVar(char *id);
+
 #endif

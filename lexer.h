@@ -17,7 +17,7 @@ FILE* file;
 HashTable* symbolTable;
 
 int numLexan;
-char idLexan;
+char *idLexan;
 int lineNumber;
 int colNumber;
 

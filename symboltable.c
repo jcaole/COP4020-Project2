@@ -194,3 +194,32 @@ void printWords(HashTable* table, int type) {
 int lookup(char *word) {
 	return getTable(ht, word);
 }
+
+
+
+//lookupEntry method for project 2
+Entry* lookupEntry(HashTable* table, const char *word) {
+    int slot = hash(word);
+
+    // try to find a valid slot
+    Entry* entries = table->entries[slot];
+    while (entries != NULL) {
+        // return entry if found
+        if (strcmp(entries->word, word) == 0) {
+            return entries;
+        }
+        entries = entries->next;
+    }
+
+    // entry not found
+    return NULL;
+}
+//lookupVar method for project 2
+int lookupVar(char *id) {
+	Entry* entry = lookupEntry(ht, id);
+	if(entry == NULL) {
+		return 0;
+	}
+	return 1;
+}
+
