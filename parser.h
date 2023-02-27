@@ -19,9 +19,7 @@ int lineNum;
 
 
 int registers;			//added for project 2
-//unsigned int varNumber		//added for project 2
-//char vars[MAX][MAX];		//added for project 2
-//char output[SIZE];		//added for project 2
+
 
 void parser(char* fileName);
 void assignmentStmt();
@@ -31,6 +29,6 @@ void factor();
 void match(int type);
 void end();
 
-char* setOperator(int);		//project 2 method
-
+void setOperator(int);		//project 2 method
+void declareVar(char* varName); //project 2 method
 #endif

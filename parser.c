@@ -10,7 +10,7 @@
 void parser(char* fileName) {
 	lookahead = 0;
 
-//	registers = 0;
+	registers = 0;
 //	varNumber = 0;
 
 	initLexer(fileName);
@@ -48,31 +48,47 @@ void assignmentStmt() {
 }
 
 void expression() {
-	term();
+/*	term();
 	while (lookahead == '+' || lookahead == '-') {
 		match(lookahead);
 		term();
 	}
+*/
+	term();
+	while(lookahead == '+' || lookahead == '-') {
+		int operation = lookahead;
+		match(operation);
+		term();
+		if(operation == '+') {
+			printf("ADD R%d, R%d\n", registers - 2, registers - 1);
+		}
+		else {
+			printf("SUB R%d, R%d\n", registers - 2, registers - 1);
+		}
+		registers--;
+	}
 }
 
 void term() {
-	factor();
+/*	factor();
 	while (lookahead == '*' || lookahead == '/') {
 			match(lookahead);
 		factor();
 	}
-
-/*	while (lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '/') {
-		char* firstLook = setOperator(lookahead);
-		match(lookahead);
-		factor();
-		sprintf(output + strlen(output), "R%d = R%d %s R%d\n", registers - 2,
-				registers - 2, firstLook, registers -1);
-		registers -= 1;
-		strcpy(vars[varNumber], firstLook);
-		varsNumber++;
-	}
 */
+	factor();
+	while(lookahead == '*' || lookahead == '/') {
+		int operation = lookahead;
+		match(operation);
+		factor();
+		if(operation == '*') {
+			printf("MUL R%d, R%d\n", registers - 2, registers - 1);
+		}
+		else {
+			printf("DIV R%d, R%d\n", registers - 2, registers - 1);
+		}
+		registers--;
+	}
 }
 
 void factor() {
@@ -88,8 +104,19 @@ void factor() {
 		match(')');
 	}
 }
+
+/*
+ * project 2 method
+ */
+void setOperator(int lookahead) {
+	if (lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '/') {
+		match(lookahead);
+	} 
+}
+
 void match(int type) {
-	
+	setOperator(lookahead);
+
 	if (lookahead == type) {
 		lookahead = lexan();
 	} 
@@ -98,10 +125,6 @@ void match(int type) {
 		printf("Missing closing parenthesis on line %d, col %d.\n", getLineNum(), getColNum());
 		end(1);
 	}
-	//	
-	else if (type == ID) {
-		exit(1);
-	} 
 	//
 	else if (type == BEGIN) {
 		printf("Syntax error on line %d, col %d. All programs must start with 'begin'\n", getLineNum(), getColNum());
@@ -132,20 +155,13 @@ void end(int status) {
 	cleanTable(symbolTable);
 	exit(EXIT_SUCCESS);
 }
-
-//project 2 method setOperator
-char* setOperator(int lookahead) {
-	if(lookahead == '+' ){ 
-		return "+";
-	}
-	else if(lookahead == '-') {
-		return "-";
-	}
-	else if(lookahead == '*') {
-		return "*";
-	}
-	else {
-		return "/";
-	}
+//added method for project 2
+/*void declareVar(char* varName) {
+    if (lookup(varName) == NULL) {
+        insert(symbolTable, varName, 0); // add the variable to the symbol table with initial value 0
+    } else {
+        printf("Error: Variable %s already declared on line %d, col %d\n", varName, getLineNum(), getColNum());
+        end(1);
+    }
 }
-
+*/
