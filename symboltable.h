@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 //defined variables
 #define ID 300
@@ -24,21 +23,11 @@
 
 //NOTE: typedef is needed to create a new name for existing datatype
 //entry struct
-/*typedef struct Entry {
+typedef struct Entry {
 	char *word;
 	int value;
 	struct Entry* next;
 }Entry;
-*/
-//modified for project 2
-typedef struct Entry {
-    char *word;
-    int value;
-    struct Entry* next;
-    bool isDeclared; // new member to keep track of whether the variable is declared or not
-}Entry;
-
-
 
 //hashtable struct
 typedef struct HashTable {
@@ -77,8 +66,6 @@ HashTable* initSymbolTable();
 
 //method to check word in symbol table
 int lookup(char *word);
-
-
 
 //methods added for project 2
 Entry* lookupEntry(HashTable* table, const char *word);

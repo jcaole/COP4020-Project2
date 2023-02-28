@@ -27,10 +27,16 @@ void parser(char* fileName) {
 
 
 void assignmentStmt() {
+/*	if(lookupVar(idLexan) == NOT_FOUND) {
+		printf("Line %d error: identifier %d is not initialized\n", getLineNum(), getColNum());
+		exit(1);
+	}
+*/	
 	match(ID);
-	if (lookahead != '=') {
+	if (lookahead != '=') {	
 		printf("Expected an '=' on line %d, col %d\nFail\n", getLineNum(), getColNum());
 		exit(1);
+//		end(1);
 	} 
 	else {
 		match(lookahead);
@@ -160,12 +166,12 @@ void end(int status) {
 	exit(EXIT_SUCCESS);
 }
 //added method for project 2
-/*void declareVar(char* varName) {
-    if (lookupVar(symbolTable, varName) == NULL) {
-        insert(symbolTable, varName, 0); // add the variable to the symbol table with initial value 0
+void declareVar(char* varName) {
+    if (lookupVar(varName) == NOT_FOUND) {
+        setEntries(varName, 0); // add the variable to the symbol table with initial value 0
     } else {
         printf("Error: Variable %s already declared on line %d, col %d\n", varName, getLineNum(), getColNum());
         end(1);
     }
 }
-*/
+

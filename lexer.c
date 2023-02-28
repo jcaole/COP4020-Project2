@@ -124,7 +124,7 @@ int lexan() {
 			else if (strcmp(idLexan, "end.") == 0) {
 				setTable(symbolTable, idLexan, END);
 			}
-
+//			int type = lookup(idLexan);
 			int type = lookup(idLexan);
 			if (type == NOT_FOUND) {
 				type = ID;
