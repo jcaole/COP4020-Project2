@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include "lexer.h"
 
-#define SIZE 1000		//added for project 2
 
 int lookahead;
 int lineNum;

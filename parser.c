@@ -27,14 +27,6 @@ void parser(char* fileName) {
 
 
 void assignmentStmt() {
-/*	char a[30];
-	strcpy(a, idLexan);
-
-	if(lookahead == INT) {
-		match(INT);
-		if(lookupVar(idLexan)) {
-			printf("Line: % Redeclaration of %s\n", lineNum, idLexan);
-*/
 	match(ID);
 	if (lookahead != '=') {
 		printf("Expected an '=' on line %d, col %d\nFail\n", getLineNum(), getColNum());
@@ -45,6 +37,7 @@ void assignmentStmt() {
 		expression();
 		match(';');
 	}
+
 }
 
 void expression() {
@@ -168,7 +161,7 @@ void end(int status) {
 }
 //added method for project 2
 /*void declareVar(char* varName) {
-    if (lookup(varName) == NULL) {
+    if (lookupVar(symbolTable, varName) == NULL) {
         insert(symbolTable, varName, 0); // add the variable to the symbol table with initial value 0
     } else {
         printf("Error: Variable %s already declared on line %d, col %d\n", varName, getLineNum(), getColNum());

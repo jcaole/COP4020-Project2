@@ -7,7 +7,7 @@
  */
 
 #include "symboltable.h"
-
+#include <stdbool.h>
 HashTable* initSymbolTable() {
 	ht = createTable();
 	return ht;
@@ -52,7 +52,7 @@ Entry* setEntries(const char *word, const int value) {
 }
 
 // insert a word and value into the table
-void setTable(HashTable* table, const char *word, const int value) {
+/*void setTable(HashTable* table, const char *word, const int value) {
 	int slot = hash(word);
 
 	// try to look up an entries set
@@ -84,6 +84,51 @@ void setTable(HashTable* table, const char *word, const int value) {
 	// end of chain reached without a match, add new
 	prev->next = setEntries(word, value);
 }
+*/
+
+void setTable(HashTable* table, const char *word, const int value) {
+    int slot = hash(word);
+
+    // try to look up an entries set
+    Entry* entries = table->entries[slot];
+
+    // no entries means slot empty, insert immediately
+    if (entries == NULL) {
+        Entry* newEntry = setEntries(word, value);
+        newEntry->isDeclared = true; // set the flag to true for the new entry
+        table->entries[slot] = newEntry;
+        return;
+    }
+
+    Entry* prev;
+
+    // walk through each entries until either the end is
+    // reached or a matching word is found
+    while (entries != NULL) {
+        // check word
+        if (strcmp(entries->word, word) == 0) {
+            // match found, replace value
+            entries->value = value;
+            if (!entries->isDeclared) {
+                entries->isDeclared = true; // set the flag to true for the existing entry
+            } else {
+                printf("Error: illegal redefinition %s\n", word); // variable redefinition error
+            }
+            return;
+        }
+
+        // walk to next
+        prev = entries;
+        entries = prev->next;
+    }
+
+    // end of chain reached without a match, add new
+    Entry* newEntry = setEntries(word, value);
+    newEntry->isDeclared = true; // set the flag to true for the new entry
+    prev->next = newEntry;
+}
+
+
 
 // search for a specific value by its word
 int getTable(HashTable* table, const char *word) {
@@ -191,8 +236,30 @@ void printWords(HashTable* table, int type) {
 	printf("\n");
 }
 
-int lookup(char *word) {
+/*int lookup(char *word) {
 	return getTable(ht, word);
+}
+*/
+int lookup(char *word) {
+    int slot = hash(word);
+
+    // try to find a valid slot
+    Entry* entries = ht->entries[slot];
+
+    while (entries != NULL) {
+        // return value if found
+        if (strcmp(entries->word, word) == 0) {
+            if (entries->isDeclared) {
+                return entries->value;
+            } else {
+                printf("Error: undefined variable %s\n", word); // undefined variable error
+                return -1; // return a dummy value to indicate the error
+            }
+        }
+
+        entries = entries->next;
+    }
+    return NOT_FOUND;
 }
 
 
@@ -214,6 +281,7 @@ Entry* lookupEntry(HashTable* table, const char *word) {
     // entry not found
     return NULL;
 }
+
 //lookupVar method for project 2
 int lookupVar(char *id) {
 	Entry* entry = lookupEntry(ht, id);
