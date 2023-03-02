@@ -63,7 +63,13 @@ int lexan() {
 			//initializes number of characters to 0
 			int numChars = 0;
 			//use of malloc
-			char* numLexan = malloc(sizeof(char*));
+			//
+			//edit for project 2
+			//
+			//char* numLexan = malloc(sizeof(char*));
+			numLexan = malloc(sizeof(char*));
+
+
 			while (isdigit(ch)) {
 				colNumber++;
 				numLexan = realloc(numLexan, ++numChars * sizeof(char));
@@ -80,7 +86,11 @@ int lexan() {
 			int numChars = 0;
 			int capacity = 256;
 
-			char* idLexan = malloc(sizeof(char) * capacity);
+			//
+			//edit for project 2
+			//
+			//char* idLexan = malloc(sizeof(char) * capacity);
+			idLexan = malloc(sizeof(char) * capacity);
 			//use of isalnum for alpha and numerical characters
 			while ((isalnum(ch) || ch == '_' || ch == '.') && ch != '\n') {
 
@@ -113,10 +123,29 @@ int lexan() {
 			if (idLexan[strlen(idLexan) - 1] == '_') {
 				printf("Syntax error on line %d, col %d. Identifiers cannot end with an underscore.\nFail\n", lineNumber, colNumber);
 				free(idLexan);
+				//
+				//edit for project 2
+				free(numLexan);
+				exit(1);
+				//end of edit
+			
+			
 				return DONE;
 			}
 			ch = ungetc(ch, file);
 			colNumber--;
+
+			//
+			//edit for project 2
+			//
+/*			if(strcmp(idLexan, "int") == 0) {
+				printf("found the int keyword, returning type = %d\n", INT);
+//				return INT;
+				setTable(symbolTable, idLexan, INT);
+			}
+*/			//
+			//end of edit for project 2
+			//
 
 			if (strcmp(idLexan, "begin") == 0){
 				setTable(symbolTable, idLexan, BEGIN);

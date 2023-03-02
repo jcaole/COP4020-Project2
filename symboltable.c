@@ -144,7 +144,7 @@ void cleanTable(HashTable* table) {
 // print table
 void printTable(HashTable* table) {
 	//
-	printf("slot     word = value\n");
+	printf("slot[    ] word = value\n");
 	for (int i = 0; i < MAX; ++i) {
 		Entry* entries = table->entries[i];
 		//
@@ -167,6 +167,9 @@ void printTable(HashTable* table) {
 
 // print all the words, used after completed checks.
 void printWords(HashTable* table, int type) {
+
+	printf("slot[    ] key = value\n");
+
 	for (int i = 0; i < MAX; ++i) {
 		Entry* entries = table->entries[i];
 		//
@@ -188,7 +191,7 @@ void printWords(HashTable* table, int type) {
 			}
 		}
 	}
-	printf("\n");
+	printf("]\n");
 }
 
 int lookup(char *word) {

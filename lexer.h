@@ -16,8 +16,10 @@ FILE* file;
 //struct Hashtable
 HashTable* symbolTable;
 
-int numLexan;
+char * numLexan;
 char *idLexan;
+
+
 int lineNumber;
 int colNumber;
 
@@ -28,5 +30,9 @@ int lexan();
 //getters
 int getLineNum();
 int getColNum();
+
+//project 2 getters
+char* getNumLexeme();
+char* getIdLexeme();
 
 #endif

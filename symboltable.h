@@ -21,6 +21,9 @@
 #define NOT_FOUND 404
 #define MAX 500
 
+//project 2 variables
+#define INT 302
+
 //NOTE: typedef is needed to create a new name for existing datatype
 //entry struct
 typedef struct Entry {
