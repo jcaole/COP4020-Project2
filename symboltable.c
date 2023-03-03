@@ -52,12 +52,17 @@ Entry* setEntries(const char *word, const int value) {
 }
 
 // insert a word and value into the table
-void setTable(HashTable* table, const char *word, const int value) {
+void setTable(HashTable* table, const char *word, int value) {
 	int slot = hash(word);
 
 	// try to look up an entries set
 	Entry* entries = table->entries[slot];
 
+	//added for project 2
+	if (strcmp(word, "INT") == 0) {
+		value = INT;
+	}
+//	int slot = hash(word);
 	// no entries means slot empty, insert immediately
 	if (entries == NULL) {
 		table->entries[slot] = setEntries(word, value);
@@ -94,6 +99,9 @@ int getTable(HashTable* table, const char *word) {
 	// printf("The entries at slot %d is %d\n", slot, entries->value);
 
 	while (entries != NULL) {
+		if(strcmp(word, "INT") == 0) {
+			return INT;
+		}
 		// return value if found
 		if (strcmp(entries->word, word) == 0) {
 			return entries->value;

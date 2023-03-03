@@ -52,7 +52,7 @@ int hash(const char *word);
 HashTable* createTable();
 
 //set entries
-Entry* setEntries(const char *word, const int value);
+Entry* setEntries(const char *word, int value);
 
 //methods to print content of table
 void printTable(HashTable* table);

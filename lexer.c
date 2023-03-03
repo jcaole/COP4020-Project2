@@ -138,12 +138,12 @@ int lexan() {
 			//
 			//edit for project 2
 			//
-/*			if(strcmp(idLexan, "int") == 0) {
+			if(strcmp(idLexan, "int") == 0) {
 				printf("found the int keyword, returning type = %d\n", INT);
-//				return INT;
+				return INT;
 				setTable(symbolTable, idLexan, INT);
 			}
-*/			//
+			//
 			//end of edit for project 2
 			//
 

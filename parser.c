@@ -27,14 +27,15 @@ void parser(char* fileName) {
 
 
 void assignmentStmt() {
-/*	if(lookupVar(idLexan) == NOT_FOUND) {
-		printf("Line %d error: identifier %d is not initialized\n", getLineNum(), getColNum());
-		exit(1);
+	if(lookupVar(idLexan) == NOT_FOUND) {
+		printf("Error Line %d: variable %d is not initialized\n", getLineNum(), getColNum());
+		end(1);
 	}
-*/	
+	
 	match(ID);
+	
 	if (lookahead != '=') {	
-		printf("Expected an '=' on line %d, col %d\nFail\n", getLineNum(), getColNum());
+		printf("Error Line %d: expected '=' \nFail\n", getLineNum(), getColNum());
 		exit(1);
 //		end(1);
 	} 
