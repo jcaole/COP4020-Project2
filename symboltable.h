@@ -1,26 +1,40 @@
+/* File Name:	symboltable.h
+ * Course: 	COP4020
+ * Project:	#2
+ * Author:	Jeremy Caole
+ * Description: header file for class symbol table
+ */
+
 #ifndef SYMBOLTABLE
 #define SYMBOLTABLE
 
-
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdbool.h>
+
 #include "lexer.h"
 
 
-// required values for the table
-#define MAX 250
+/*
+ * moved defined variables to lexical analyzer class.
+ */
+#define MAX 500
 
-char end[MAX];
+/*
+ * initilized start and end array variables
+ */
 char start[MAX];
+char end[MAX];
 
-// This is the struc used to create
-// the symble table, linkedList
+/*
+ * removed Hashtable struct, struct Entry creates symbol table
+ * utilizes linkedlist 
+ */
 struct Entry {
-      	char value[MAX];
-      	int typ;
+      	char word[MAX];
+      	int value;
       	struct Entry *next;
       	int line;
 };
@@ -28,10 +42,17 @@ struct Entry {
 struct Entry *head;
 struct Entry *newEntry;
 
-// function
-bool lookupVar(char *lexema);
+/*
+ *modified for project 2
+ */
 void initSymbolTable(void);
-void insertEntry(char *lexema, int line, int size);
-void free_table();
+bool lookupVar(char *word);
+
+void insertEntry(char *id, int line, int size);
+
+/*
+ * modified cleanTable method from project 1
+ */
+void freeTable();
 
 #endif

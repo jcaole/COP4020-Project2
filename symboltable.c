@@ -1,23 +1,28 @@
-/* 
- *
+/* File Name:	symboltable.c
+ * Course: 	COP4020
+ * Project:	#2
+ * Author:	Jeremy Caole
+ * Description: class symbol table, holds symbol table needed for lexicalanalyzer and parser class.
+ * adds and searches for words in table.
  */
 
 #include "symboltable.h"
 
 // this functuons iniztialize the table.
 void initSymbolTable() {
-//	strcpy(end, "end.");
 	strcpy(start, "begin");
 	strcpy(end, "end.");
 }
 
-// this function checks if the lexema is in the table
-bool lookupVar(char *lexema) {
+/*
+ * lookupVar method, looks for variable in table
+ */
+bool lookupVar(char *lexeme) {
       	struct Entry *current = head;
       	if (current == NULL) {
 	    	return false;
       	}
-      	while (strcmp(current->value, lexema) != 0) {
+      	while (strcmp(current->word, lexeme) != 0) {
 	    	if (current->next == NULL) {
 		  	return false;
 	    	} 
@@ -28,12 +33,13 @@ bool lookupVar(char *lexema) {
       	return true;
 }
 
-
-// this function insert lexemas at the end table
-void insertEntry(char *lexema, int line, int t) {
+/*
+ * isertEntry method, adds entries to table
+ */
+void insertEntry(char *id, int line, int t) {
       	newEntry = (struct Entry *)malloc(sizeof(struct Entry));
-      	strncpy(newEntry->value, lexema, sizeof(newEntry->value) - 1);
-      	newEntry->typ = t;
+      	strncpy(newEntry->word, id, sizeof(newEntry->word) - 1);
+      	newEntry->value = t;
       	newEntry->next = NULL;
       	newEntry->line = line;
 
@@ -49,9 +55,10 @@ void insertEntry(char *lexema, int line, int t) {
       	}
 }
 
-// this funcion is to free the space allocate each time
-// a new element was added to the table
-void free_table() {
+/*
+ * freeTable method, modified cleanTable, delete content in table
+ */
+void freeTable() {
       	struct Entry *pNode = head, *pNext;
       	while (NULL != pNode) {
 	    	pNext = pNode->next;

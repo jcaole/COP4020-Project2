@@ -1,56 +1,64 @@
-/*
+/* FileName:	lexer.c
+ * Course:	COP4020
+ * Project:	#2
+ * Author:	Jeremy Caole
+ * Description: lexical analyzer class, analyzes, inserts IDs into the symbol
+ * table, runs lexical analyzer.
  */
 
 #include "lexer.h"
 
-// This function open a file for reading
-// and starts reading the contect
-void initLexer(char *name) {
-       	file = fopen(name, "r");
-      	lineNr = 1;
+// main method, initializes lexical analyzer
+void initLexer(char *fileName) {
+       	file = fopen(fileName, "r");
+      	lineNumber = 1;
       	lookahead = lexan();
 }
 
-// This function reads char by char the file
-// and depending of the char it will store them
-// in an array to store in the table symbol.
-// This function will return the value of a char or
-// the type of lexema.
+/*
+ * lexical analyzer, reads each character in file.
+ * store character in array to be used in symbol table.
+ * return values: char, type,lexeme
+ */
 int lexan() {
       	memset(idLexeme, 0, MAX);
-      	idLen = 0;
+      	idLength = 0;
       	while (1) {
 	    	ch = fgetc(file);
+		//if params, do nothing
 	    	if (ch == ' ' || ch == '\t' || ch == ',') {
-		  	; // do nothing
+		  	;
 		}
+		//else if, increment lineNumber
 	       	else if (ch == '\n') {
-		  	lineNr++;
+		  	lineNumber++;
 		}
+		//else if, read comment till '\n'
 	       	else if (ch == '~') {
 		  	while (ch != '\n') {
-				// read the comment until finding \n
 				ch = fgetc(file);
 		  	}
 		  	ungetc(ch, file);
 		}
+		//else if, insert whole number, type NUM
 	       	else if (isdigit(ch)) {
 		  	while (isdigit(ch)) {
-				// inserr digit to lexem
+				//use of strncat
 				strncat(idLexeme, &ch, 1);
 				ch = fgetc(file);
 		  	}
 		  	ungetc(ch, file);
 		  	return NUM;
 	    	}
+		//else if, insert alphabet
 	       	else if (isalpha(ch)) {
 		  	while (isalpha(ch) || isdigit(ch) || ch == '.' || ch == '_') {
-				// insert into idLExeme
+				//use of strncat				 
 				strncat(idLexeme, &ch, 1);
-				idLen++;
+				idLength++;
 				ch = fgetc(file);
 		  	}
-		  	type = getTyp(idLexeme, idLen);
+		  	type = getType(idLexeme, idLength);
 		  	ungetc(ch, file);
 		  	return type;
 	    	}
@@ -64,29 +72,35 @@ int lexan() {
       	}
 }
 
-// this is a help function that identifies the type of the lexema
-// and it will return its correct type.
-int getTyp(char *lexema, int size) {
-
-      	if (strcmp(lexema, start) == 0) {
+/*
+ * helper function getType, gets type of lexeme, returns correct tyep.
+ */
+int getType(char *lexeme, int size) {
+	//begin
+      	if (strcmp(lexeme, start) == 0) {
 	    	return BEGIN;
       	}
-       	else if (strcmp(lexema, end) == 0) {
+	//end
+       	else if (strcmp(lexeme, end) == 0) {
 	    	return END;
       	}
-       	else if (lexema[0] == '_') {
-	    	return START_U;
+	//begining underscore
+       	else if (lexeme[0] == '_') {
+	    	return START_UNDERSCORE;
 	} 
-	else if (lexema[size - 1] == '_') {
-	    	return END_U;
+	//ending underscore
+	else if (lexeme[size - 1] == '_') {
+	    	return END_UNDERSCORE;
       	}
-       	else if (strcmp(lexema, "int") == 0) {
+	//int
+       	else if (strcmp(lexeme, "int") == 0) {
 	    	return INT;
       	}
+	//two underscore
        	else {
 	    	for (int i = 0; i < MAX - 1; i++) {
-		  	if (lexema[i] == '_' && lexema[i + 1] == '_') {
-				return TWO_U;
+		  	if (lexeme[i] == '_' && lexeme[i + 1] == '_') {
+				return TWO_UNDERSCORE;
 		  	}
 	    	}
       	}
