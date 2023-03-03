@@ -1,33 +1,30 @@
-/* File Name:	parser.h
- * Course:	COP4020
- * Project:	#1
- * Author:	Jeremy Caole
- * Description: header file for parser class
+/*
  */
 
 #ifndef PARSER
 #define PARSER
 
+#include "lexer.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "lexer.h"
 
+#define SIZE 1000
 
-int lookahead;
-int lineNum;
+char vars[MAX][MAX];
+char output[SIZE];
+int registers;
+unsigned int varsNr;
 
-
-int registers;			//added for project 2
-
-
-void parser(char* fileName);
-void assignmentStmt();
-void expression();
+void process();
+void declaration();
+void variable(int);
+void AssignStmt();
 void term();
 void factor();
-void match(int type);
-void end();
-
-void setOperator(int);		//project 2 method
-void declareVar(char* varName); //project 2 method
+void match(int);
+void printStatmt();
+void parse();
+void printError(char);
+char* setOperator(int);
 #endif

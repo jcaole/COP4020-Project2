@@ -1,13 +1,22 @@
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS  = -g -Wall
 
-OBJECTS: symboltable.o lexer.o parser.o
+OBJECTS: symboltable.o lexer.o parser.o main.o
 
-#main: $(OBJECTS) main.o
-#	$(CC) $(CFLAGS) -o $@ $^
+lexer.o: lexer.h 
+	$(CC) $(CFLAGS) -c lexer.c
 
-main:   symboltable.o lexer.o parser.o main.o
-	$(CC) $(CFLAGS) -o $@ $^
+parser.o: parser.h
+	$(CC) $(CFLAGS) -c parser.c
 
-clean:
-	$(RM) *.o main
+symboltable.o: symboltable.h
+	$(CC) $(CFLAGS) -c symboltable.c
+
+main.o: lexer.h parser.h
+	$(CC) $(CFLAGS) -c main.c
+
+main: lexer.o parser.o symboltable.o main.o 
+	$(CC) $(CFLAGS) lexer.o parser.o symboltable.o main.o -o main
+
+clean: 
+	$(RM) *.o *.out main

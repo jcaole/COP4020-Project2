@@ -1,186 +1,94 @@
-/* File Name:
- * Course:
- * Project:
- * Author:
- * Description: source file for the lexical analyzer, analyzes the type of token, symbol table 
- * is needed for this file
+/*
  */
 
 #include "lexer.h"
 
-// main method, initializes lexical analyzer
-void initLexer(char* fileName) {
-	lineNumber = 1;
-	colNumber = 1;
-
-	//initializes symboltable
-	symbolTable = initSymbolTable();
-
-	file = fopen(fileName, "r");
+// This function open a file for reading
+// and starts reading the contect
+void initLexer(char *name) {
+       	file = fopen(name, "r");
+      	lineNr = 1;
+      	lookahead = lexan();
 }
 
-//getter for line number
-int getLineNumber() {
-	return lineNumber;
-}
-
-// lexan method reads each character in file
+// This function reads char by char the file
+// and depending of the char it will store them
+// in an array to store in the table symbol.
+// This function will return the value of a char or
+// the type of lexema.
 int lexan() {
-	//initializes ch, use of fgetc
-	char ch = fgetc(file);
-	//increment column number
-	colNumber++;
-	//do while loop
-	do {
-		//whitespaces ignored
-		if (ch == ' ' || ch == '\t') {
-
-			//initializes ch, use of fgetc
-			ch = fgetc(file);
-			//increment column number
-			colNumber++;
-		} 
-		//newline ignored
-		else if (ch == '\n') {
-			//increments line
-			lineNumber++;
-			//initiliaze column number to 0 before incrememnting
-			colNumber = 0;
-			ch = fgetc(file);
-			colNumber++;
-		} 
-		//comment igmored
-		else if (ch == '~') {
-			// checks for newline
-			while (ch != '\n') {
-				ch = fgetc(file);
-			}
-			colNumber = 0;
+      	memset(idLexeme, 0, MAX);
+      	idLen = 0;
+      	while (1) {
+	    	ch = fgetc(file);
+	    	if (ch == ' ' || ch == '\t' || ch == ',') {
+		  	; // do nothing
 		}
-		//use of isdigit, gets whole number returns correct type	
-		else if (isdigit(ch)) {
-
-			//initializes number of characters to 0
-			int numChars = 0;
-			//use of malloc
-			//
-			//edit for project 2
-			//
-			//char* numLexan = malloc(sizeof(char*));
-			numLexan = malloc(sizeof(char*));
-
-
-			while (isdigit(ch)) {
-				colNumber++;
-				numLexan = realloc(numLexan, ++numChars * sizeof(char));
-				//use of strncat
-				strncat(numLexan, &ch, numChars + 1);
-				ch = fgetc(file);
-			}
-			ch = ungetc(ch, file);
-			colNumber--;
-			return NUM;
+	       	else if (ch == '\n') {
+		  	lineNr++;
 		}
-		//use of isalpha for alphabetical charaters
-		else if (isalpha(ch)) {
-			int numChars = 0;
-			int capacity = 256;
-
-			//
-			//edit for project 2
-			//
-			//char* idLexan = malloc(sizeof(char) * capacity);
-			idLexan = malloc(sizeof(char) * capacity);
-			//use of isalnum for alpha and numerical characters
-			while ((isalnum(ch) || ch == '_' || ch == '.') && ch != '\n') {
-
-				if (numChars == capacity - 1) {
-					idLexan = realloc(idLexan, sizeof(char) * capacity);
-				}
-
-				if (ch == '_') {
-					char nextChar = fgetc(file);
-					if (nextChar == '_') {
-						printf("Syntax error on line %d, col %d. Identifiers cannot contain consecutive underscores.\n", lineNumber, colNumber);
-						free(idLexan);
-						return DONE;
-					}
-					nextChar = ungetc(nextChar, file);
-					colNumber--;
-				}
-				if (ch == '.'){
-					char nextChar = fgetc(file);
-					if (nextChar != '\n') {
-						free(idLexan);
-						return DONE;
-					}
-				}
-				idLexan[numChars++] = ch;
+	       	else if (ch == '~') {
+		  	while (ch != '\n') {
+				// read the comment until finding \n
 				ch = fgetc(file);
-				colNumber++;
-			}
-
-			if (idLexan[strlen(idLexan) - 1] == '_') {
-				printf("Syntax error on line %d, col %d. Identifiers cannot end with an underscore.\nFail\n", lineNumber, colNumber);
-				free(idLexan);
-				//
-				//edit for project 2
-				free(numLexan);
-				exit(1);
-				//end of edit
-			
-			
-				return DONE;
-			}
-			ch = ungetc(ch, file);
-			colNumber--;
-
-			//
-			//edit for project 2
-			//
-			if(strcmp(idLexan, "int") == 0) {
-				printf("found the int keyword, returning type = %d\n", INT);
-				return INT;
-				setTable(symbolTable, idLexan, INT);
-			}
-			//
-			//end of edit for project 2
-			//
-
-			if (strcmp(idLexan, "begin") == 0){
-				setTable(symbolTable, idLexan, BEGIN);
-			} 
-			else if (strcmp(idLexan, "end.") == 0) {
-				setTable(symbolTable, idLexan, END);
-			}
-//			int type = lookup(idLexan);
-			int type = lookup(idLexan);
-			if (type == NOT_FOUND) {
-				type = ID;
-				setTable(symbolTable, idLexan, type);
-			}
-			free(idLexan);
-			return type;
-
-		} 
-		else if (ch == EOF) {
-			return DONE;
-		} 
-		else {
-			return ch;
+		  	}
+		  	ungetc(ch, file);
 		}
+	       	else if (isdigit(ch)) {
+		  	while (isdigit(ch)) {
+				// inserr digit to lexem
+				strncat(idLexeme, &ch, 1);
+				ch = fgetc(file);
+		  	}
+		  	ungetc(ch, file);
+		  	return NUM;
+	    	}
+	       	else if (isalpha(ch)) {
+		  	while (isalpha(ch) || isdigit(ch) || ch == '.' || ch == '_') {
+				// insert into idLExeme
+				strncat(idLexeme, &ch, 1);
+				idLen++;
+				ch = fgetc(file);
+		  	}
+		  	type = getTyp(idLexeme, idLen);
+		  	ungetc(ch, file);
+		  	return type;
+	    	}
+	       	else if (ch == EOF) {
+		  	return DONE;
+	    	}
+	       	else {
+		  	strncat(idLexeme, &ch, 1);
+		  	return ch;
+	    	}
+      	}
+}
+
+// this is a help function that identifies the type of the lexema
+// and it will return its correct type.
+int getTyp(char *lexema, int size) {
+
+      	if (strcmp(lexema, start) == 0) {
+	    	return BEGIN;
+      	}
+       	else if (strcmp(lexema, end) == 0) {
+	    	return END;
+      	}
+       	else if (lexema[0] == '_') {
+	    	return START_U;
 	} 
-	while (!feof(file));
-
-	return DONE;
-}
-
-/*
- * getters needed
- */
-int getLineNum() {
-	return lineNumber;
-}
-int getColNum() {
-	return colNumber;
+	else if (lexema[size - 1] == '_') {
+	    	return END_U;
+      	}
+       	else if (strcmp(lexema, "int") == 0) {
+	    	return INT;
+      	}
+       	else {
+	    	for (int i = 0; i < MAX - 1; i++) {
+		  	if (lexema[i] == '_' && lexema[i + 1] == '_') {
+				return TWO_U;
+		  	}
+	    	}
+      	}
+      	return ID;
 }

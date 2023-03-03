@@ -1,178 +1,215 @@
-/* File NAme:	parser.c
- * Course:	COP4020 Programming Languages
- * Project:	1
- * Author:	Jeremy Caole
- * Description:	source code of parser class. parses tokens in order. content based on given pseudo code.
- */
-
 #include "parser.h"
 
-void parser(char* fileName) {
-	lookahead = 0;
+// this function will run until we finish succesfully
+// or we have to finish because an error happened.
+void parse() {
+      	registers = 0;
+      	varsNr = 0;
+      	while (lookahead != BEGIN) {
+	    	match(lookahead);
+	    	if (lookahead == DONE) {
+		  	printf("\nNever found START of program\n\n");
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+      	}
+      	match(BEGIN);
+      	while (lookahead != END) {
+	    	if (lookahead == DONE) {
+		  	printf("\nNever found END of program\n\n");
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+	    	process();
+      	}
+      	printf("\nSuccess.\n");
+      	free_table();
+      	fclose(file);
+}
 
-	registers = 0;
-//	varNumber = 0;
+// function to check if the term or operation needed
+// is on the file.
+void match(int t) {
+      	if (lookahead == t) {
+	    	lookahead = lexan();
+      	}
+       	else {
+	    	printError(t);
+      	}
+}
 
-	initLexer(fileName);
-	match(lookahead);
-	match(BEGIN);
-	do {
-		assignmentStmt();
-	} 
-	while (lookahead == ID);
-	
-	match(END);
-	end(0);
+//This function runs first the var declaration
+// and the assigments operations
+void process() {
+      	while (lookahead == INT) {
+	    	declaration();
+      	}
+      	while (lookahead == ID) {
+	    	AssignStmt();
+      	}
+}
+
+// This function start checking for variables declarations
+void declaration() {
+      	match(INT);
+      	variable(type);
+      	match(';');
+}
+
+// this function will add each variable to my symboltable
+void variable(int type) {
+      	while (lookahead == ID) {
+	    	if (lookupVar(idLexeme)) {
+		  	printf("\nLine: %d variable '%s' already defined \n", lineNr, idLexeme);
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+	    	insertEntry(idLexeme, lineNr, ID);
+	    	match(ID);
+      	}
+}
+
+// funcion to check if the assigment operation
+// is right and keep track of register
+void AssignStmt() {
+      	char a[30];
+      	strcpy(a, idLexeme);
+
+      	if (lookahead == INT) {
+	    	match(INT);
+	    	if (lookupVar(idLexeme)) {
+		  	printf("\nError Line %d: Redeclaration of %s\n", lineNr, idLexeme);
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+      	}
+      	if (lookahead == ID && !lookupVar(idLexeme)) {
+	    	printf("\nError Line %d: Variable %s is undefined\n", lineNr, idLexeme);
+	    	free_table();
+	    	fclose(file);
+	    	exit(1);
+      	}
+      	match(ID);
+
+      	if (lookahead != '=') {
+	    	printf("\nError Line %d: Syntax error expected '='\n", lineNr);
+	    	free_table();
+	    	fclose(file);
+	    	exit(1);
+      	}
+      	match('=');
+      	term();
+      	match(';');
+
+      	registers -= 1;
+      	sprintf(output + strlen(output), "%s = R%d\n", a, registers);
+      	printStatmt();
 }
 
 
-void assignmentStmt() {
-	if(lookupVar(idLexan) == NOT_FOUND) {
-		printf("Error Line %d: variable %d is not initialized\n", getLineNum(), getColNum());
-		end(1);
-	}
-	
-	match(ID);
-	
-	if (lookahead != '=') {	
-		printf("Error Line %d: expected '=' \nFail\n", getLineNum(), getColNum());
-		exit(1);
-//		end(1);
-	} 
-	else {
-		match(lookahead);
-		expression();
-		match(';');
-	}
-
-}
-
-void expression() {
-/*	term();
-	while (lookahead == '+' || lookahead == '-') {
-		match(lookahead);
-		term();
-	}
-*/
-	term();
-	while(lookahead == '+' || lookahead == '-') {
-		int operation = lookahead;
-		match(operation);
-		term();
-		if(operation == '+') {
-			printf("ADD R%d, R%d\n", registers - 2, registers - 1);
-		}
-		else {
-			printf("SUB R%d, R%d\n", registers - 2, registers - 1);
-		}
-		registers--;
-	}
-}
-
+// this function is the definition for each term
 void term() {
-/*	factor();
-	while (lookahead == '*' || lookahead == '/') {
-			match(lookahead);
-		factor();
-	}
-*/
-	factor();
-	while(lookahead == '*' || lookahead == '/') {
-		int operation = lookahead;
-		match(operation);
-		factor();
-		if(operation == '*') {
-			printf("MUL R%d, R%d\n", registers - 2, registers - 1);
-		}
-		else {
-			printf("DIV R%d, R%d\n", registers - 2, registers - 1);
-		}
-		registers--;
-	}
+      	factor();
+      	while (lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '/') {
+	    	char* looker = setOperator(lookahead);
+	    	match(lookahead);
+	    	factor();
+
+	    	sprintf(output + strlen(output), "R%d = R%d %s R%d\n", registers - 2, registers - 2, looker, registers - 1);
+	    	registers -= 1;
+	    	strcpy(vars[varsNr], looker);
+	    	varsNr++;
+      	}
 }
 
-void factor() {
-	if (lookahead == ID) {
-		match(ID);
-	} 
-	else if (lookahead == NUM) {
-		match(NUM);
-	} 
-	else if (lookahead == '(') {
-		match('(');
-		expression();
-		match(')');
+//this function set the operator 
+char* setOperator(int lookahead){
+	if(lookahead == '+' ) {
+		return "+";
 	}
-}
-
-/*
- * project 2 method
- */
-void setOperator(int lookahead) {
-	if (lookahead == '+' || lookahead == '-' || lookahead == '*' || lookahead == '/') {
-		match(lookahead);
-	} 
-}
-
-void match(int type) {
-	setOperator(lookahead);
-
-	if (lookahead == type) {
-		lookahead = lexan();
+	else if(lookahead == '-') {
+		return "-";
 	}
-
-	//added for project 2
-	else if(type == ID) {
-		if(lookupVar(idLexan) == 0) {
-		printf("Semantic error: variable %s is used before it has been declared on line %d, col %d.\n", idLexan, getLineNum(), getColNum());
-		end(1);
-		}
-		lookahead = lexan();
+	else if(lookahead == '*' ) {
+		return "*";
 	}
-
-
-	//
-	else if (type == ')') {
-		printf("Missing closing parenthesis on line %d, col %d.\n", getLineNum(), getColNum());
-		end(1);
-	}
-	//
-	else if (type == BEGIN) {
-		printf("Syntax error on line %d, col %d. All programs must start with 'begin'\n", getLineNum(), getColNum());
-		end(1);
-	} 
-	else if (type == END) {
-		printf("Syntax error on line %d, col %d. All programs must start with 'end'\n", getLineNum(), getColNum());
-		end(1);
-	} 
-	else if (type == ';') {
-		printf("Syntax error on line %d, col %d. Every assignment statement must end with a semicolon ';' 'end'\n", getLineNum(), getColNum());
-		end(1);
-	} 
 	else {
-		printf("Syntax error on line %d, col %d.\n", getLineNum(), getColNum());
-		end(1);
+		return "/";
 	}
 }
 
-void end(int status) {
-	if (status != 0) {
-		printf("Fail\n");
-		cleanTable(symbolTable);
-		exit(EXIT_FAILURE);
+// funcion to check if the factor contains the right
+// experssion and if ( ) were missed.
+void factor() {
+      	if (lookahead == '(') {
+	    	match('(');
+	    	if (lookahead == ')') {
+		  	printf("\nError Line %d: Expected identifier got ')'\n", lineNr);
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+	    	term();
+	    	match(')');
+      	}
+       	else if (lookahead == ID) {
+	    	if (!lookupVar(idLexeme)) {
+		  	printf("\nError Line %d: Variable %s not declared\n", lineNr, idLexeme);
+		  	free_table();
+		  	fclose(file);
+		  	exit(1);
+	    	}
+	    	sprintf(output + strlen(output), "R%d = %s\n", registers++, idLexeme);
+	    	strcpy(vars[varsNr], idLexeme);
+	    	varsNr++;
+	    	match(lookahead);
 	}
-	printf("Success\n");
-	printWords(symbolTable, ID);
-	cleanTable(symbolTable);
-	exit(EXIT_SUCCESS);
-}
-//added method for project 2
-void declareVar(char* varName) {
-    if (lookupVar(varName) == NOT_FOUND) {
-        setEntries(varName, 0); // add the variable to the symbol table with initial value 0
-    } else {
-        printf("Error: Variable %s already declared on line %d, col %d\n", varName, getLineNum(), getColNum());
-        end(1);
-    }
+       	else if (lookahead == NUM) {
+	    	sprintf(output + strlen(output), "R%d = %s\n", registers++, idLexeme);
+	    	strcpy(vars[varsNr], idLexeme);
+	    	varsNr++;
+	    	match(lookahead);
+      	}
 }
 
+// print list of variables and operators
+void printStatmt() {
+      	int i;
+      	sprintf(output + strlen(output), "\n*****[");
+      	for (i = 0; i < varsNr - 1; i++) {
+	    	sprintf(output + strlen(output), "%s", vars[i]);
+	    	sprintf(output + strlen(output), ",");
+      	}
+      	sprintf(output + strlen(output), "%s", vars[i]);
+      	sprintf(output + strlen(output), "]*****\n\n");
+      	varsNr = 0;
+}
+
+//this function print the error found.
+void printError(char c) {
+      	if (lookahead == START_U) {
+	    	printf("\nError Line %d: Identifier cannot start with underscore\n", lineNr);
+      	}
+	else if (lookahead == END_U) {
+	    	printf("\nError Line %d: Identifier cannot end with underscore\n", lineNr);
+      	}
+	else if (lookahead == TWO_U) {
+	    	printf("\nError Line %d: Identifier has underscore followed by other underscore\n", lineNr);
+      	} 
+	else if (c == '(') {
+	    	printf("\nError Line %d: syntax error expected '%c'\n", lineNr, c);
+      	} 
+	else if (c == ')') {
+	    	printf("\nError Line %d: syntax error expected '%c'\n", lineNr, c);
+      	}
+	else if (c == ';') {
+	    	printf("\nError Line %d: syntax error expected '%c'\n", lineNr, c);
+      	}
+      	free_table();
+      	fclose(file);
+      	exit(1);
+}

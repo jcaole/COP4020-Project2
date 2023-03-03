@@ -1,38 +1,36 @@
-/* FileName:	lexer.h
- * Course:	COP4020
- * Project:	#1
- * Author:	Jeremy Caole
- * Description: header file for the lexical analyzer
+/*
  */
 
 #ifndef LEXER
 #define LEXER
-
 #include "symboltable.h"
 #include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 
-FILE* file;
+#define MAX 250
+#define ID 300
+#define NUM 301
+#define BEGIN 400
+#define END 401
+#define NOT_FOUND -1
+#define DONE 800
+#define START_U 801
+#define END_U 802
+#define TWO_U 803
+#define INT 200
 
-//struct Hashtable
-HashTable* symbolTable;
+FILE *file, *o_fp;
+int lineNr;
+char ch;
+int type;
+int lookahead;
+int idLen;
 
-char * numLexan;
-char *idLexan;
-
-
-int lineNumber;
-int colNumber;
-
-//initializes lexical analyzer
-void initLexer(char* fileName);
-int lexan();
-
-//getters
-int getLineNum();
-int getColNum();
-
-//project 2 getters
-char* getNumLexeme();
-char* getIdLexeme();
+// functions
+int lexan(void);
+void initLexer(char *name);
+char idLexeme[MAX];
+int getTyp(char *lexema, int size);
 
 #endif
