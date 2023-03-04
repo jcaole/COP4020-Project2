@@ -34,7 +34,6 @@
 #define TWO_UNDERSCORE 803
 
 FILE *file;
-FILE *o_fp;
 
 int lineNumber;
 char ch;

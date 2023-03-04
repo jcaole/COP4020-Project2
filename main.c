@@ -10,6 +10,7 @@
 #include "parser.h"
 
 int main(int argc, char *argv[]) {
+	FILE* outputFile;
 	memset(output, 0, 1000);
       	char file[8] = {0};
       	int i = 0;
@@ -27,10 +28,10 @@ int main(int argc, char *argv[]) {
 		}
 	    	sprintf(file + strlen(file), ".out");
 	    	
-		o_fp = fopen(file, "w");
-	    	fwrite(output, sizeof(char), strlen(output), o_fp);
+		outputFile = fopen(file, "w");
+	    	fwrite(output, sizeof(char), strlen(output), outputFile);
 	    	
-		fclose(o_fp);
+		fclose(outputFile);
       	}
       	return 0;
 }
