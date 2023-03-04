@@ -43,9 +43,11 @@ int idLength;
 
 char idLexeme[MAX];
 
-// functions
+/*
+ * functions
+ */
 int lexan(void);
 void initLexer(char *fileName);
-int getType(char *lexema, int size);
+int getType(char *lexeme, int size);
 
 #endif
